@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Pay to Apply - {{ job.title }}{% endblock %}
+{% block content %}
+  <section class="contact">
+    <div class="container">
+      <h2>Complete Payment</h2>
+      <div class="contact-info" style="margin-bottom:1rem;">
+        You are applying for: <strong>{{ job.title }}</strong> at <strong>{{ job.company }}</strong> ({{ job.location }})
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:1rem; background:#fff; padding:1rem 1.5rem; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+        <img src="{{ url_for('static', filename='qr.jpg') }}" alt="Payment QR" style="width:260px; height:auto; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08);" />
+        <form method="post" action="{{ url_for('payment_confirm', job_id=job.id) }}">
+          <button type="submit" class="btn" style="padding:0.8rem 1.4rem;">I have paid</button>
+        </form>
+      </div>
+      <div class="contact-info" style="margin-top:1rem;">
+        After payment, click "I have paid" to add this application to your profile.
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+

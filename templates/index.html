@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Seeker Job Portal{% endblock %}
+{% block content %}
+  <section class="hero">
+    <div class="container">
+      <h1>Find Your Dream Job</h1>
+      <p>Connecting talent with opportunity. Search thousands of jobs and take the next step in your career.</p>
+      <form class="job-search" id="job-search-form" action="#jobs">
+        <input type="text" id="search-title" placeholder="Job title or keyword">
+        <select id="search-location" name="search-location">
+          <option value="">Select Mumbai Location</option>
+          <option value="Mumbai">Mumbai (All)</option>
+          <option value="Andheri">Andheri</option>
+          <option value="Bandra">Bandra</option>
+          <option value="Borivali">Borivali</option>
+          <option value="Dadar">Dadar</option>
+          <option value="Juhu">Juhu</option>
+          <option value="Powai">Powai</option>
+          <option value="Navi Mumbai">Navi Mumbai</option>
+          <option value="Thane">Thane</option>
+        </select>
+        <button type="submit" class="btn">Search Jobs</button>
+      </form>
+    </div>
+  </section>
+  <section id="jobs" class="jobs">
+    <div class="container">
+      <h2>Latest Job Listings</h2>
+      <div class="job-listings" id="job-listings">
+        {% for job in jobs %}
+        <div class="job-card" onclick="window.location.href='{{ url_for('job_detail', job_id=job.id) }}'">
+          <h3>{{ job.title }}</h3>
+          <span class="company">{{ job.company }}</span> | <span class="location">{{ job.location }}</span>
+          <p>{{ job.description }}</p>
+          <a href="{{ url_for('job_apply', job_id=job.id) }}" class="btn secondary" onclick="event.stopPropagation();">Apply</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  <section id="how" class="how-it-works">
+    <div class="container">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon">🔍</div>
+          <h4>Search Jobs</h4>
+          <p>Browse and filter jobs by title, location, or keyword to find the perfect match.</p>
+        </div>
+        <div class="step">
+          <div class="step-icon">📝</div>
+          <h4>Apply Online</h4>
+          <p>Submit your application directly through our portal in just a few clicks.</p>
+        </div>
+        <div class="step">
+          <div class="step-icon">🤝</div>
+          <h4>Get Hired</h4>
+          <p>Connect with top employers and land your dream job quickly and easily.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="testimonials" class="testimonials">
+    <div class="container">
+      <h2>Success Stories</h2>
+      <div class="testimonial-list">
+        <div class="testimonial">
+          <p>Seeker helped me land my first remote developer job! The process was smooth and the listings were top-notch.</p>
+          <h4>Priya Sharma</h4>
+          <span>Frontend Developer</span>
+        </div>
+        <div class="testimonial">
+          <p>As an employer, I found great talent quickly. The portal is easy to use and very effective.</p>
+          <h4>Rahul Mehta</h4>
+          <span>HR Manager, TechNova</span>
+        </div>
+        <div class="testimonial">
+          <p>I love the clean interface and the variety of jobs available. Highly recommended for job seekers!</p>
+          <h4>Emily Chen</h4>
+          <span>UI/UX Designer</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <form>
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <textarea placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+      <div class="contact-info">
+        <p>Email: <a href="mailto:info@seeker.in">seekernetworkofficial@gmail.com </a></p>
+        <p>Instagram: <a href="https://www.instagram.com/seeker.networkofficial/">seeker.networkofficial</a></p>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}{% if mode == 'signup' %}Sign Up{% else %}Sign In{% endif %} - Seeker{% endblock %}
+{% block content %}
+  <section class="contact">
+    <div class="container">
+      <h2>{% if mode == 'signup' %}Create Account{% else %}Welcome Back{% endif %}</h2>
+      <form method="post" action="{% if mode == 'signup' %}{{ url_for('signup_post') }}{% else %}{{ url_for('login_post') }}{% endif %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}" style="text-align:center; padding: 0.6rem 1rem; border-radius: 10px; margin-bottom: 0.8rem; background: #f0f4ff; color: #0927eb;">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if mode == 'signup' %}
+          <input type="text" name="name" placeholder="Full Name" required>
+          <input type="email" name="email" placeholder="Email" required>
+          <input type="tel" name="phone" placeholder="Phone Number">
+          <select name="role" required>
+            <option value="individual">Register as Individual</option>
+            <option value="company">Register as Company</option>
+          </select>
+          <input type="password" name="password" placeholder="Password" required>
+          <button type="submit">Create Account</button>
+          <div class="contact-info" style="margin-top: 1rem;">
+            Already have an account? <a href="{{ url_for('login_get') }}">Sign In</a>
+          </div>
+        {% else %}
+          <input type="email" name="email" placeholder="Email" required>
+          <input type="password" name="password" placeholder="Password" required>
+          <button type="submit">Sign In</button>
+          <div class="contact-info" style="margin-top: 1rem;">
+            New here? <a href="{{ url_for('signup_get') }}">Create an account</a>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </section>
+{% endblock %}
+
+

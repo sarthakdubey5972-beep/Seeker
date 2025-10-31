@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Verify Email - Seeker{% endblock %}
+{% block content %}
+  <section class="contact">
+    <div class="container">
+      <h2>Verify your email</h2>
+      <div class="contact-info" style="margin-bottom:1rem;">
+        {% if email %}
+          We sent a 6-digit code to <strong>{{ email }}</strong>.
+        {% else %}
+          Enter the 6-digit code sent to your email.
+        {% endif %}
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}" style="text-align:center; padding: 0.6rem 1rem; border-radius: 10px; margin-bottom: 0.8rem; background: #f0f4ff; color: #0927eb;">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form method="post" action="{{ url_for('verify_post') }}">
+        <input type="text" name="code" placeholder="6-digit code" pattern="\d{6}" required>
+        <button type="submit">Verify</button>
+      </form>
+      <form method="post" action="{{ url_for('resend_otp') }}" style="margin-top:0.6rem; text-align:center;">
+        <button type="submit" class="btn" style="padding:0.6rem 1rem;">Resend Code</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+
+

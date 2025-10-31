@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Company Dashboard{% endblock %}
+{% block content %}
+  <section class="contact">
+    <div class="container">
+      <h2>Company Dashboard</h2>
+      <div class="contact-info" style="margin-bottom:1rem;">
+        Welcome, <strong>{{ company.name }}</strong>. Post new jobs and manage your listings.
+      </div>
+      <form method="post" action="{{ url_for('company_create_job') }}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}" style="text-align:center; padding: 0.6rem 1rem; border-radius: 10px; margin-bottom: 0.8rem; background: #f0f4ff; color: #0927eb;">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <input type="text" name="title" placeholder="Job Title" required>
+        <input type="text" name="location" placeholder="Location" required>
+        <textarea name="description" placeholder="Job Description" required></textarea>
+        <button type="submit">Post Job</button>
+      </form>
+
+      <h3 style="text-align:center; margin:1.2rem 0 0.6rem 0; color:#0927eb;">Your Job Listings</h3>
+      <div class="job-listings" style="margin-top:0.8rem;">
+        {% if jobs and jobs|length > 0 %}
+          {% for job in jobs %}
+            <div class="job-card" onclick="window.location.href='{{ url_for('job_detail', job_id=job.id) }}'">
+              <h3>{{ job.title }}</h3>
+              <span class="company">{{ job.company }}</span> | <span class="location">{{ job.location }}</span>
+              <p>{{ job.description }}</p>
+              <div style="display:flex; gap:0.8rem; justify-content:flex-end;">
+                <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn secondary" onclick="event.stopPropagation();">View</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="contact-info">No jobs posted yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+

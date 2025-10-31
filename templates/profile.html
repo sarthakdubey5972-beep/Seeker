@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Your Profile - Seeker{% endblock %}
+{% block content %}
+  <section class="contact">
+    <div class="container">
+      <h2>Your Profile</h2>
+      {% if current_user %}
+        <div class="contact-info" style="margin-bottom: 1rem;">
+          <strong>Name:</strong> {{ current_user.name }}<br>
+          <strong>Email:</strong> {{ current_user.email }}<br>
+          <strong>Phone:</strong> {{ current_user.phone or '—' }}<br>
+          <strong>Role:</strong> {{ current_user.role|capitalize }}
+        </div>
+        <h3 style="text-align:center; margin:1.2rem 0 0.6rem 0; color:#0927eb;">Your Applications</h3>
+        <div class="job-listings" id="applications" style="margin-top:0.8rem;">
+          {% if applications and applications|length > 0 %}
+            {% for app in applications %}
+              <div class="job-card">
+                <h3>{{ app.title }}</h3>
+                <span class="company">{{ app.company }}</span> | <span class="location">{{ app.location }}</span>
+                <p>Applied: {{ app.created_at }}</p>
+                <span style="font-weight:600; color: {{ app.paid_at and '#0a0' or '#a00' }};">{{ app.paid_at and 'Paid' or 'Pending Payment' }}</span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="contact-info">No applications yet. Browse jobs on the <a href="{{ url_for('home') }}">home page</a>.</div>
+          {% endif %}
+        </div>
+        <div style="display:flex; gap:1rem; justify-content:center;">
+          <a class="dropdown-item" href="{{ url_for('logout') }}" style="display:inline-block; padding:0.8rem 1.2rem; background:#0927eb; color:#fff; border-radius:10px; text-decoration:none;">Logout</a>
+        </div>
+      {% else %}
+        <div class="contact-info" style="margin-bottom: 1rem;">You're not signed in.</div>
+        <div style="display:flex; gap:1rem; justify-content:center;">
+          <a class="dropdown-item" href="{{ url_for('login_get') }}" style="display:inline-block; padding:0.8rem 1.2rem; background:#0927eb; color:#fff; border-radius:10px; text-decoration:none;">Sign In</a>
+          <a class="dropdown-item" href="{{ url_for('signup_get') }}" style="display:inline-block; padding:0.8rem 1.2rem; background:#3a5bfa; color:#fff; border-radius:10px; text-decoration:none;">Sign Up</a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}
+
+

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ job.title }} - {{ job.company }}{% endblock %}
+{% block content %}
+  <section class="jobs">
+    <div class="container">
+      <h2>{{ job.title }}</h2>
+      <div class="job-listings">
+        <div class="job-card expanded" style="max-height:none;">
+          <h3>{{ job.company }}</h3>
+          <span class="location">{{ job.location }}</span>
+          <p style="margin-top:1rem;">{{ job.description }}</p>
+          <p style="color:#666; margin-top:0.5rem;">Posted: {{ job.posted_at }}</p>
+          <div style="display:flex; gap:0.8rem; justify-content:flex-end; margin-top:1rem;">
+            <a href="{{ url_for('job_apply', job_id=job.id) }}" class="btn secondary">Apply</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+

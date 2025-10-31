@@ -36,7 +36,7 @@ def init_db():
         );
         """
     )
-    # Best-effort schema upgrade for verification columns
+    # Best-effort schema upgrades
     try:
         conn.execute('ALTER TABLE users ADD COLUMN is_verified INTEGER NOT NULL DEFAULT 0')
     except Exception:
@@ -57,15 +57,11 @@ def init_db():
             company TEXT NOT NULL,
             location TEXT NOT NULL,
             description TEXT NOT NULL,
-            posted_at TEXT NOT NULL
+            posted_at TEXT NOT NULL,
+            poster_user_id INTEGER
         );
         """
     )
-    # Best-effort schema upgrade to track poster user id
-    try:
-        conn.execute('ALTER TABLE jobs ADD COLUMN poster_user_id INTEGER')
-    except Exception:
-        pass
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS applications (
@@ -80,7 +76,7 @@ def init_db():
         );
         """
     )
-    # Seed a few jobs if empty
+    # Seed jobs if empty
     existing = conn.execute('SELECT COUNT(*) AS c FROM jobs').fetchone()['c']
     if existing == 0:
         seed_jobs = [
@@ -102,8 +98,9 @@ def create_app():
     app.config['SMTP_PASS'] = os.environ.get('SEEKER_SMTP_PASS', '')
     app.config['EXTERNAL_BASE_URL'] = os.environ.get('SEEKER_BASE_URL', 'http://127.0.0.1:5000')
 
-    # Ensure DB exists
+    # Initialize DB
     init_db()
+
     def generate_otp() -> str:
         return f"{random.randint(100000, 999999)}"
 
@@ -114,46 +111,20 @@ def create_app():
         secondary = "#3a5bfa"
         return f"""<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Verify your email</title>
-  </head>
-  <body style="margin:0;padding:0;background:#f5f7ff;font-family:Segoe UI,Arial,sans-serif;color:#111;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f7ff;padding:24px 0;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:16px;box-shadow:0 6px 28px rgba(9,39,235,0.12);overflow:hidden;">
-            <tr>
-              <td style="background:linear-gradient(90deg,{primary},{secondary});padding:20px 24px">
-                <img src="{logo_url}" alt="Seeker" style="height:40px;display:block">
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:28px 28px 8px 28px;">
-                <h1 style="margin:0 0 8px 0;font-size:22px;color:#0b1a3a;">Verify your email</h1>
-                <p style="margin:0;color:#445;line-height:1.5;">Use the one-time code below to verify your Seeker account. This code is valid for 10 minutes.</p>
-              </td>
-            </tr>
-            <tr>
-              <td align="center" style="padding:8px 28px 24px 28px">
-                <div style="font-size:32px;letter-spacing:6px;font-weight:800;color:{primary};background:#eef2ff;border:2px solid {secondary};border-radius:12px;padding:16px 24px;display:inline-block">{otp}</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 28px 24px 28px;">
-                <a href="{base}/verify" style="display:inline-block;background:linear-gradient(90deg,{primary},{secondary});color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600">Open verification page</a>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 28px 28px 28px;color:#667;">
-                <p style="font-size:12px;line-height:1.6;margin:0">If you didn’t create a Seeker account, please ignore this email.</p>
-              </td>
-            </tr>
-          </table>
-          <div style="color:#99a; font-size:12px; margin-top:16px;">&copy; 2025 Seeker Media Private Limited</div>
-        </td>
-      </tr>
+  <body style="background:#f5f7ff;font-family:Segoe UI,Arial,sans-serif;color:#111;">
+    <table width="100%" cellspacing="0" cellpadding="0" style="background:#f5f7ff;padding:24px 0;">
+      <tr><td align="center">
+        <table width="640" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:16px;box-shadow:0 6px 28px rgba(9,39,235,0.12);">
+          <tr><td style="background:linear-gradient(90deg,{primary},{secondary});padding:20px 24px">
+            <img src="{logo_url}" alt="Seeker" style="height:40px;display:block">
+          </td></tr>
+          <tr><td style="padding:28px;">
+            <h1 style="font-size:22px;">Verify your email</h1>
+            <p>Use this one-time code to verify your Seeker account. It’s valid for 10 minutes.</p>
+            <div style="font-size:32px;letter-spacing:6px;font-weight:800;color:{primary};border:2px solid {secondary};border-radius:12px;padding:16px 24px;display:inline-block">{otp}</div>
+          </td></tr>
+        </table>
+      </td></tr>
     </table>
   </body>
 </html>"""
@@ -250,7 +221,6 @@ def create_app():
             flash('Email is already registered.', 'error')
             conn.close()
             return redirect(url_for('signup_get'))
-        # Send OTP email
         email_sent = send_email(
             to_email=email,
             subject='Verify your email · Seeker',
@@ -303,7 +273,6 @@ def create_app():
         session.pop('pending_verify_email', None)
         session['user_id'] = user['id']
         flash('Email verified successfully.', 'success')
-        # Redirect based on role
         if user['role'] == 'individual':
             return redirect(url_for('home'))
         return redirect(url_for('company_dashboard'))
@@ -431,8 +400,8 @@ def create_app():
     return app
 
 
+# ✅ Make Flask app available for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
-    app.run(host='127.0.0.1', port=5000, debug=True)
-
-
+    app.run(host='0.0.0.0', port=5000, debug=True)
